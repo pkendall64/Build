@@ -291,6 +291,10 @@ case "$DEVICE" in
     check_os_release "armv7" "$VERSION" "$DEVICE"
     sh scripts/vszeroimage.sh -v "$VERSION" -p "$PATCH" -a armv7
     ;;
+  orangepione) echo 'Writing OrangePi One Image File'
+    check_os_release "armv7" "$VERSION" "$DEVICE"
+    sh scripts/orangepioneimage.sh -v "$VERSION" -p "$PATCH" -a armv7
+    ;;
   x86) echo 'Writing x86 Image File'
     check_os_release "x86" "$VERSION" "$DEVICE"
     sh scripts/x86image.sh -v "$VERSION" -p "$PATCH";
