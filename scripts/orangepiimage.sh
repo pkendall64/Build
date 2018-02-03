@@ -5,6 +5,9 @@ ARCH="armv7"
 
 while getopts ":d:v:p:" opt; do
   case $opt in
+    d)
+      DEVICE=$OPTARG
+      ;;
     v)
       VERSION=$OPTARG
       ;;
@@ -16,7 +19,7 @@ while getopts ":d:v:p:" opt; do
 done
 
 BUILDDATE=$(date -I)
-IMG_FILE="Volumio${VERSION}-${BUILDDATE}-orangepione.img"
+IMG_FILE="Volumio${VERSION}-${BUILDDATE}-${DEVICE}.img"
 
 if [ "$ARCH" = arm ]; then
   DISTRO="Raspbian"
@@ -68,12 +71,12 @@ else
 	git clone https://github.com/pkendall64/platform-orangepi.git platform-orangepi
 	echo "Unpack the OrangePi platform files"
 	cd platform-orangepi
-	tar xfJ opione.tar.xz
+	tar xfJ "${DEVICE}.tar.xz"
 	cd ..
 fi
 
 echo "Burning the bootloader and u-boot"
-dd if=platform-orangepi/opione/u-boot/u-boot-sunxi-with-spl.bin of=${LOOP_DEV} bs=1024 seek=8 conv=notrunc
+dd if=platform-orangepi/${DEVICE}/u-boot/u-boot-sunxi-with-spl.bin of=${LOOP_DEV} bs=1024 seek=8 conv=notrunc
 sync
 
 echo "Preparing for Volumio rootfs"
@@ -104,12 +107,12 @@ echo "Copying Volumio RootFs"
 cp -pdR build/armv7/root/* /mnt/volumio/rootfs
 
 echo "Copying OrangePi boot files, kernel, modules and firmware"
-cp -pdR platform-orangepi/opione/boot /mnt/volumio/rootfs
-cp -pdR platform-orangepi/opione/lib/modules /mnt/volumio/rootfs/lib
-cp -pdR platform-orangepi/opione/lib/firmware /mnt/volumio/rootfs/lib
+cp -pdR platform-orangepi/${DEVICE}/boot /mnt/volumio/rootfs
+cp -pdR platform-orangepi/${DEVICE}/lib/modules /mnt/volumio/rootfs/lib
+cp -pdR platform-orangepi/${DEVICE}/lib/firmware /mnt/volumio/rootfs/lib
 
 echo "Preparing to run chroot for more OrangePi configuration"
-cp scripts/orangepioneconfig.sh /mnt/volumio/rootfs
+cp scripts/orangepiconfig.sh /mnt/volumio/rootfs
 cp scripts/initramfs/init_armbian  /mnt/volumio/rootfs/root/init
 cp scripts/initramfs/mkinitramfs-custom.sh /mnt/volumio/rootfs/usr/local/sbin
 #copy the scripts for updating from usb
@@ -122,11 +125,11 @@ echo $PATCH > /mnt/volumio/rootfs/patch
 
 chroot /mnt/volumio/rootfs /bin/bash -x <<'EOF'
 su -
-/orangepioneconfig.sh
+/orangepiconfig.sh
 EOF
 
 #cleanup
-rm /mnt/volumio/rootfs/orangepioneconfig.sh /mnt/volumio/rootfs/root/init
+rm /mnt/volumio/rootfs/orangepiconfig.sh /mnt/volumio/rootfs/root/init
 
 echo "Unmounting Temp devices"
 umount -l /mnt/volumio/rootfs/dev
