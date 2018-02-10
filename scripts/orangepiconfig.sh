@@ -5,7 +5,7 @@ PATCH=$(cat /patch)
 # This script will be run in chroot under qemu.
 
 echo "Creating \"fstab\""
-echo "# OrangePi One fstab" > /etc/fstab
+echo "# OrangePi fstab" > /etc/fstab
 echo "" >> /etc/fstab
 echo "proc            /proc           proc    defaults        0       0
 /dev/mmcblk0p1  /boot           vfat    defaults,utf8,user,rw,umask=111,dmask=000        0       1
@@ -77,7 +77,7 @@ echo "Creating initramfs 'volumio.initrd'"
 mkinitramfs-custom.sh -o /tmp/initramfs-tmp
 
 echo "Creating uInitrd from 'volumio.initrd'"
-mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d /boot/volumio.initrd /boot/volumiord
+mkimage -A arm -O linux -T ramdisk -C none -a 0 -e 0 -n uInitrd -d /boot/volumio.initrd /boot/uInitrd
 mkimage -A arm -T script -C none -d /boot/boot.cmd /boot/boot.scr
 echo "Cleaning up"
 # rm /boot/volumio.initrd

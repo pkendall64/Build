@@ -141,7 +141,7 @@ echo "==> OrangePi device installed"
 
 #echo "Removing temporary platform files"
 #echo "(you can keep it safely as long as you're sure of no changes)"
-#rm -r platform-bananapi
+#rm -r platform-orangepi
 sync
 
 echo "Preparing rootfs base for SquashFS"
