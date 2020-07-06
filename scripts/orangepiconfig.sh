@@ -37,6 +37,7 @@ echo "overlay" >> /etc/initramfs-tools/modules
 echo "overlayfs" >> /etc/initramfs-tools/modules
 echo "squashfs" >> /etc/initramfs-tools/modules
 echo "nls_cp437" >> /etc/initramfs-tools/modules
+echo "fuse" >> /etc/initramfs-tools/modules
 
 echo "Copying volumio initramfs updater"
 cd /root/
@@ -55,6 +56,9 @@ sh patch.sh
 else
 echo "Cannot Find Patch File, aborting"
 fi
+if [ -f "install.sh" ]; then
+sh install.sh
+fi
 cd /
 rm -rf ${PATCH}
 fi
@@ -62,15 +66,15 @@ rm /patch
 
 echo "Installing winbind here, since it freezes networking"
 apt-get update
-apt-get install -y winbind libnss-winbind
+apt-get install -y winbind libnss-winbind device-tree-compiler
 
 echo "adding gpio group and udev rules"
 groupadd -f --system gpio
 usermod -aG gpio volumio
 touch /etc/udev/rules.d/99-gpio.rules
-echo "SUBSYSTEM==\"gpio\", ACTION==\"add\", RUN=\"/bin/sh -c '
+echo "SUBSYSTEM==\"gpio\", ACTION==\"add\", RUN=\"/bin/sh -c ' \
         chown -R root:gpio /sys/class/gpio && chmod -R 770 /sys/class/gpio;\
-        chown -R root:gpio /sys$DEVPATH && chmod -R 770 /sys$DEVPATH\
+        chown -R root:gpio /sys\$DEVPATH && chmod -R 770 /sys\$DEVPATH\
 '\"" > /etc/udev/rules.d/99-gpio.rules
 
 echo "Cleaning APT Cache and remove policy file"
